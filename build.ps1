@@ -27,7 +27,10 @@ param(
 	[string] $Suffix,
 
 	[Parameter(Position = 7)]
-	[string] $BuildArches = "win-x86;win-x64;win-arm64"
+	[string] $BuildArches = "win-x86;win-x64;win-arm64",
+
+	[Parameter(Position = 8)]
+	[string] $CefVersionString
 )
 
 Set-StrictMode -version latest
@@ -666,6 +669,10 @@ try
 	if($Suffix)
 	{
 		$CefPackageVersion = $CefPackageVersion + '-' + $Suffix
+	}
+	if($CefVersionString)
+	{
+		$CefPackageVersion = $CefVersionString
 	}
 
 	CheckDependencies
