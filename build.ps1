@@ -14,7 +14,7 @@ param(
 	[string] $CefBinaryDir = "../cefsource/chromium/src/cef/binary_distrib/",
 
 	[Parameter(Position = 3)]
-	$CefVersion = "95.7.8+g69b7dc3+chromium-95.0.4638.17",
+	$CefVersion = "121.2.14+ga44b59f+chromium-121.0.6167.75",
 
 	[ValidateSet("tar.bz2","zip","7z")]
 	[Parameter(Position = 4)]
@@ -239,10 +239,10 @@ function Msvs
 	$VS_VER = 16;
 	$VS_OFFICIAL_VER = 2019;
 		
-	if ($_ -eq 'v143')
+	if ($Toolchain -eq 'v143')
 	{
 		$VS_VER=17;
-		$VS_OFFICIAL_VER=2021;
+		$VS_OFFICIAL_VER=2022;
 	}
 	
 	Write-Diagnostic "VSWhere path $global:VSwherePath"
@@ -254,7 +254,13 @@ function Msvs
 		
 	if($null -eq $VSInstallPath -or !(Test-Path $VSInstallPath))
 	{
-		Die "Visual Studio $VS_OFFICIAL_VER was not found"
+		$VSInstallPath = & $global:VSwherePath -version $versionSearchStr -property installationPath -products 'Microsoft.VisualStudio.Product.BuildTools'
+		Write-Diagnostic "BuildTools $($VS_OFFICIAL_VER)InstallPath: $VSInstallPath"
+
+		if($null -eq $VSInstallPath -or !(Test-Path $VSInstallPath))
+		{
+			Die "Visual Studio $VS_OFFICIAL_VER was not found"
+		}
 	}
 		
 	$VisualStudioVersion = "$VS_VER.0"
@@ -441,11 +447,6 @@ function Nupkg
 		$archLong = $platform.ArchLong
 
 		# Build packages
-		if ($arch -ne "arm64")
-		{
-			. $Nuget pack nuget\cef.redist.nuspec -NoPackageAnalysis -Version $CefPackageVersion -Properties "Configuration=Release;Platform=$arch;CPlatform=$archLong;" -OutputDirectory nuget
-		}
-
 		. $Nuget pack nuget\chromiumembeddedframework.runtime.win.nuspec -NoPackageAnalysis -Version $CefPackageVersion -Properties "Configuration=Release;Platform=$arch;CPlatform=$archLong;" -OutputDirectory nuget
 	}
 		
