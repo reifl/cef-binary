@@ -746,7 +746,7 @@ try
 		{
 			"nupkg"
 			{
-				VSX v142 $platform
+				VSX v143 $platform
 			}
 			"vs2022"
 			{
